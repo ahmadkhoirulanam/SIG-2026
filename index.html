@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <title>UdaraSemarang - WebGIS Kualitas Udara &amp; Kendaraan Kota Semarang</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="SIG, WebGIS, kualitas udara, ISPU, kendaraan bermotor, Semarang" name="keywords">
+    <meta content="Sistem Informasi Geografis hubungan tingkat kualitas udara dengan jumlah kendaraan bermotor di Kota Semarang" name="description">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <!-- Leaflet (peta) -->
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Topbar Start -->
+    <div class="container-fluid bg-dark">
+        <div class="row py-2 px-lg-5">
+            <div class="col-lg-6 text-center text-lg-left mb-2 mb-lg-0">
+                <div class="d-inline-flex align-items-center text-white">
+                    <small><i class="fa fa-map-marked-alt mr-2"></i>Studi Kasus Sistem Informasi Geografis</small>
+                    <small class="px-3">|</small>
+                    <small><i class="fa fa-city mr-2"></i>Kota Semarang, Jawa Tengah</small>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center text-lg-right">
+                <div class="d-inline-flex align-items-center text-white">
+                    <small><i class="fa fa-calendar-alt mr-2"></i>Data tahun <span id="tahun-data">2024</span></small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid p-0 sticky-top shadow-sm">
+        <nav class="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0 px-lg-5">
+            <a href="index.html" class="navbar-brand ml-lg-3">
+                <h1 class="m-0 text-uppercase text-primary"><i class="fa fa-wind mr-3"></i>UdaraSemarang</h1>
+            </a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between px-lg-3" id="navbarCollapse">
+                <div class="navbar-nav mx-auto py-0">
+                    <a href="#beranda" class="nav-item nav-link active">Beranda</a>
+                    <a href="#latar-belakang" class="nav-item nav-link">Latar Belakang</a>
+                    <a href="#peta-section" class="nav-item nav-link">Peta</a>
+                    <a href="#grafik" class="nav-item nav-link">Analisis</a>
+                    <a href="#data" class="nav-item nav-link">Data</a>
+                    <a href="#metodologi" class="nav-item nav-link">Metodologi</a>
+                    <a href="#tim" class="nav-item nav-link">Tim</a>
+                    <a href="#kontak" class="nav-item nav-link">Kontak</a>
+                </div>
+                <a href="#peta-section" class="btn btn-primary py-2 px-4 d-none d-lg-block"><i class="fa fa-map mr-2"></i>Buka Peta</a>
+            </div>
+        </nav>
+    </div>
+    <!-- Navbar End -->
+
+
+    <!-- Header Start -->
+    <div id="beranda" class="jumbotron jumbotron-fluid position-relative overlay-bottom" style="margin-bottom: 90px;">
+        <div class="container text-center my-5 py-5">
+            <span class="hero-badge mb-4">WEBGIS · ANALISIS SPASIAL</span>
+            <h1 class="text-white mt-4 mb-3">Tingkat Kualitas Udara &amp; Jumlah Kendaraan</h1>
+            <h1 class="text-white display-3 mb-4">Kota Semarang</h1>
+            <p class="text-white hero-sub mx-auto mb-5">Memetakan sebaran Indeks Standar Pencemar Udara (ISPU) dan kepadatan kendaraan bermotor di 16 kecamatan untuk melihat seberapa besar pengaruh transportasi terhadap kualitas udara kota.</p>
+            <div class="mx-auto mb-5" style="width: 100%; max-width: 600px;">
+                <form id="form-cari" class="input-group">
+                    <select id="pilih-kecamatan" class="custom-select border-light" style="height: 62px;">
+                        <option value="">Pilih kecamatan...</option>
+                    </select>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-secondary px-4 px-lg-5"><i class="fa fa-search-location mr-2"></i>Lihat di Peta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Header End -->
+
+
+    <!-- Latar Belakang Start -->
+    <div id="latar-belakang" class="container-fluid py-5">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-5 mb-5 mb-lg-0">
+                    <div class="card-gis">
+                        <h5><i class="fa fa-info-circle text-primary mr-2"></i>Kategori ISPU</h5>
+                        <p class="small text-muted">Indeks Standar Pencemar Udara menurut Permen LHK No. P.14/MENLHK/SETJEN/KUM.1/7/2020.</p>
+                        <div id="legenda-ispu"></div>
+                        <hr>
+                        <p class="mb-1 small"><i class="fa fa-exclamation-triangle text-secondary mr-2"></i>ISPU tertinggi: <b id="ispu-tertinggi">-</b></p>
+                        <p class="mb-0 small"><i class="fa fa-car text-secondary mr-2"></i>Kendaraan terbanyak: <b id="kendaraan-tertinggi">-</b></p>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="section-title position-relative mb-4">
+                        <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Latar Belakang</h6>
+                        <h1 class="display-4">Transportasi &amp; Udara Bersih di Kota Semarang</h1>
+                    </div>
+                    <p>Sebagai ibu kota Provinsi Jawa Tengah, Kota Semarang mengalami pertumbuhan jumlah kendaraan bermotor yang pesat setiap tahun. Emisi gas buang kendaraan, terutama sepeda motor dan mobil pribadi, merupakan salah satu sumber utama polutan seperti PM2.5, PM10, NO<sub>2</sub>, dan CO yang menurunkan kualitas udara perkotaan.</p>
+                    <p>Penelitian ini menggunakan pendekatan <b>Sistem Informasi Geografis (SIG)</b> untuk memetakan sebaran tingkat kualitas udara (ISPU) dan jumlah kendaraan per kecamatan, kemudian menganalisis hubungan keduanya secara spasial dan statistik.</p>
+                    <div class="row pt-3 mx-0">
+                        <div class="col-6 col-md-3 px-0">
+                            <div class="bg-success text-center p-4 stat-box h-100">
+                                <h1 class="text-white" id="stat-kecamatan" data-toggle="counter-up">16</h1>
+                                <h6 class="text-uppercase text-white">Kecamatan<span class="d-block">Dipetakan</span></h6>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 px-0">
+                            <div class="bg-primary text-center p-4 stat-box h-100">
+                                <h1 class="text-white" id="stat-kendaraan" data-toggle="counter-up">0</h1>
+                                <h6 class="text-uppercase text-white">Ribu<span class="d-block">Kendaraan</span></h6>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 px-0">
+                            <div class="bg-secondary text-center p-4 stat-box h-100">
+                                <h1 class="text-white" id="stat-ispu" data-toggle="counter-up">0</h1>
+                                <h6 class="text-uppercase text-white">Rata-rata<span class="d-block">ISPU</span></h6>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 px-0">
+                            <div class="bg-warning text-center p-4 stat-box h-100">
+                                <h1 class="text-white" data-toggle="counter-up">7</h1>
+                                <h6 class="text-uppercase text-white">Parameter<span class="d-block">Polutan</span></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Latar Belakang End -->
+
+
+    <!-- Tujuan Start -->
+    <div class="container-fluid bg-image" style="margin: 90px 0;">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-6 my-5 pb-lg-5">
+                    <div class="section-title position-relative mb-4">
+                        <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Tujuan Penelitian</h6>
+                        <h1 class="display-4">Apa yang Ingin Dijawab?</h1>
+                    </div>
+                    <p class="mb-4 pb-2">Studi kasus ini berfokus pada keterkaitan antara aktivitas transportasi dan mutu udara ambien di setiap wilayah administrasi Kota Semarang.</p>
+                    <div class="d-flex mb-3">
+                        <div class="btn-icon bg-primary mr-4">
+                            <i class="fa fa-2x fa-map-marked-alt text-white"></i>
+                        </div>
+                        <div class="mt-n1">
+                            <h4>Pemetaan Sebaran</h4>
+                            <p>Memetakan distribusi tingkat kualitas udara (ISPU) dan jumlah kendaraan bermotor di 16 kecamatan Kota Semarang.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="btn-icon bg-secondary mr-4">
+                            <i class="fa fa-2x fa-chart-line text-white"></i>
+                        </div>
+                        <div class="mt-n1">
+                            <h4>Analisis Hubungan</h4>
+                            <p>Mengukur kekuatan hubungan jumlah kendaraan dengan nilai ISPU menggunakan korelasi Pearson dan regresi linear sederhana.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="btn-icon bg-warning mr-4">
+                            <i class="fa fa-2x fa-lightbulb text-white"></i>
+                        </div>
+                        <div class="mt-n1">
+                            <h4>Rekomendasi Kebijakan</h4>
+                            <p class="m-0">Mengidentifikasi kecamatan prioritas untuk upaya pengendalian emisi dan perbaikan kualitas udara.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 my-lg-5">
+                    <div class="section-title position-relative mb-4">
+                        <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Parameter ISPU</h6>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-4"><div class="polutan-item"><h4>PM<sub>2.5</sub></h4><p class="m-0 small">Partikel halus &lt; 2,5 µm, banyak dari pembakaran mesin diesel &amp; bensin.</p></div></div>
+                        <div class="col-6 mb-4"><div class="polutan-item"><h4>PM<sub>10</sub></h4><p class="m-0 small">Partikel debu &lt; 10 µm dari jalan raya, konstruksi, dan industri.</p></div></div>
+                        <div class="col-6 mb-4"><div class="polutan-item"><h4>CO</h4><p class="m-0 small">Karbon monoksida hasil pembakaran tidak sempurna kendaraan.</p></div></div>
+                        <div class="col-6 mb-4"><div class="polutan-item"><h4>NO<sub>2</sub></h4><p class="m-0 small">Nitrogen dioksida, indikator utama emisi lalu lintas.</p></div></div>
+                        <div class="col-6 mb-4"><div class="polutan-item"><h4>SO<sub>2</sub></h4><p class="m-0 small">Sulfur dioksida dari bahan bakar bersulfur &amp; industri.</p></div></div>
+                        <div class="col-6 mb-4"><div class="polutan-item"><h4>O<sub>3</sub> &amp; HC</h4><p class="m-0 small">Ozon permukaan dan hidrokarbon hasil reaksi fotokimia emisi.</p></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tujuan End -->
+
+
+    <!-- Peta Start -->
+    <div id="peta-section" class="container-fluid py-5">
+        <div class="container-fluid px-lg-5">
+            <div class="section-title text-center position-relative mb-5">
+                <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Peta Interaktif</h6>
+                <h1 class="display-4">Sebaran Kualitas Udara &amp; Kendaraan</h1>
+            </div
+            <div class="row">
+                <iframe src="peta/index.html" width="100%" height="600" frameborder="0" style="border:1;" ></iframe>
+            </div>
+        </div>
+    </div>
+    <!-- Peta End -->
+
+
+    <!-- Grafik & Analisis Start -->
+    <div id="grafik" class="container-fluid bg-image py-5" style="margin: 90px 0;">
+        <div class="container py-5">
+            <div class="section-title text-center position-relative mb-5">
+                <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Analisis</h6>
+                <h1 class="display-4">Hubungan Kendaraan &amp; ISPU</h1>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="card-gis">
+                        <h5>Diagram Pencar: Jumlah Kendaraan vs ISPU</h5>
+                        <div class="chart-box"><canvas id="grafik-korelasi"></canvas></div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="card-gis">
+                        <h5>Hasil Uji Korelasi</h5>
+                        <div class="bg-light p-4 text-center mb-3" style="border-radius:8px">
+                            <small class="text-uppercase text-muted">Koefisien Pearson (r)</small>
+                            <h1 class="display-4 text-primary mb-0" id="korelasi-r">-</h1>
+                            <span class="font-weight-bold text-secondary" id="korelasi-tafsir">-</span>
+                        </div>
+                        <p class="mb-2">Koefisien determinasi (R²): <b id="korelasi-r2">-</b></p>
+                        <p class="mb-2 small">Persamaan regresi:<br><code id="regresi-persamaan">-</code></p>
+                        <p class="small text-muted mb-0">Nilai R² menunjukkan proporsi variasi ISPU antarkecamatan yang dapat dijelaskan oleh jumlah kendaraan. Sisanya dipengaruhi faktor lain seperti kawasan industri, pelabuhan, topografi, dan vegetasi.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card-gis">
+                        <h5>Jumlah Kendaraan per Kecamatan</h5>
+                        <div class="chart-box"><canvas id="grafik-kendaraan"></canvas></div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card-gis">
+                        <h5>Nilai ISPU per Kecamatan</h5>
+                        <div class="chart-box"><canvas id="grafik-ispu"></canvas></div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card-gis">
+                        <h5>Tren Tahunan Kota Semarang</h5>
+                        <div class="chart-box small"><canvas id="grafik-tren"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Grafik & Analisis End -->
+
+
+    <!-- Data Start -->
+    <div id="data" class="container-fluid py-5">
+        <div class="container py-5">
+            <div class="section-title text-center position-relative mb-5">
+                <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Data Atribut</h6>
+                <h1 class="display-4">Tabel Data per Kecamatan</h1>
+            </div>
+            <div class="table-responsive card-gis p-0">
+                <table class="table table-hover table-gis mb-0">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Kecamatan</th>
+                            <th class="text-right">Sepeda Motor</th>
+                            <th class="text-right">Mobil</th>
+                            <th class="text-right">Total Kendaraan</th>
+                            <th class="text-center">ISPU</th>
+                            <th class="text-center">Kategori</th>
+                            <th class="text-center">Polutan Dominan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-data"></tbody>
+                </table>
+            </div>
+            <p class="small text-muted mt-3"><i class="fa fa-database mr-2"></i>Sumber: <span id="sumber-data">-</span></p>
+        </div>
+    </div>
+    <!-- Data End -->
+
+
+    <!-- Metodologi Start -->
+    <div id="metodologi" class="container-fluid bg-light py-5">
+        <div class="container py-5">
+            <div class="section-title text-center position-relative mb-5">
+                <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Metodologi</h6>
+                <h1 class="display-4">Tahapan Penelitian</h1>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-lg mb-5">
+                    <div class="step-card"><span class="step-num">1</span>
+                        <h5><i class="fa fa-database text-primary mr-2"></i>Pengumpulan Data</h5>
+                        <p class="m-0 small">Data ISPU dari DLH Kota Semarang dan data jumlah kendaraan bermotor dari BPS / Samsat per kecamatan.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg mb-5">
+                    <div class="step-card"><span class="step-num">2</span>
+                        <h5><i class="fa fa-draw-polygon text-primary mr-2"></i>Pengolahan Spasial</h5>
+                        <p class="m-0 small">Digitasi batas administrasi kecamatan, georeferensi titik pemantauan, dan join data atribut.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg mb-5">
+                    <div class="step-card"><span class="step-num">3</span>
+                        <h5><i class="fa fa-layer-group text-primary mr-2"></i>Klasifikasi</h5>
+                        <p class="m-0 small">Klasifikasi ISPU sesuai Permen LHK P.14/2020 dan kelas kepadatan kendaraan per kecamatan.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg mb-5">
+                    <div class="step-card"><span class="step-num">4</span>
+                        <h5><i class="fa fa-calculator text-primary mr-2"></i>Analisis Statistik</h5>
+                        <p class="m-0 small">Uji korelasi Pearson dan regresi linear sederhana antara jumlah kendaraan dan nilai ISPU.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg mb-5">
+                    <div class="step-card"><span class="step-num">5</span>
+                        <h5><i class="fa fa-globe-asia text-primary mr-2"></i>Visualisasi WebGIS</h5>
+                        <p class="m-0 small">Penyajian peta interaktif, grafik, dan tabel dalam aplikasi web berbasis Leaflet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Metodologi End -->
+
+
+    <!-- Tim Start -->
+    <div id="tim" class="container-fluid py-5">
+        <div class="container py-5">
+            <div class="section-title text-center position-relative mb-5">
+                <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Tim Peneliti</h6>
+                <h1 class="display-4">Anggota Kelompok</h1>
+            </div>
+            <div class="owl-carousel team-carousel position-relative" style="padding: 0 30px;">
+                <div class="team-item">
+                    <div class="bg-light text-center p-4">
+                        <div class="avatar mb-4">A1</div>
+                        <h5 class="mb-2">Nama Anggota 1</h5>
+                        <p class="mb-1">NIM: 0000000000</p>
+                        <p class="mb-0 text-primary small">Ketua · Analisis Spasial</p>
+                    </div>
+                </div>
+                <div class="team-item">
+                    <div class="bg-light text-center p-4">
+                        <div class="avatar mb-4">A2</div>
+                        <h5 class="mb-2">Nama Anggota 2</h5>
+                        <p class="mb-1">NIM: 0000000000</p>
+                        <p class="mb-0 text-primary small">Pengumpulan Data</p>
+                    </div>
+                </div>
+                <div class="team-item">
+                    <div class="bg-light text-center p-4">
+                        <div class="avatar mb-4">A3</div>
+                        <h5 class="mb-2">Nama Anggota 3</h5>
+                        <p class="mb-1">NIM: 0000000000</p>
+                        <p class="mb-0 text-primary small">Pengolahan &amp; Digitasi Peta</p>
+                    </div>
+                </div>
+                <div class="team-item">
+                    <div class="bg-light text-center p-4">
+                        <div class="avatar mb-4">A4</div>
+                        <h5 class="mb-2">Nama Anggota 4</h5>
+                        <p class="mb-1">NIM: 0000000000</p>
+                        <p class="mb-0 text-primary small">Pengembangan WebGIS</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tim End -->
+
+
+    <!-- Rekomendasi Start -->
+    <div class="container-fluid bg-image py-5" style="margin: 90px 0;">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-5 mb-5 mb-lg-0">
+                    <div class="section-title position-relative mb-4">
+                        <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Rekomendasi</h6>
+                        <h1 class="display-4">Langkah Menuju Udara Bersih</h1>
+                    </div>
+                    <p class="m-0">Berdasarkan hasil pemetaan dan analisis, berikut beberapa rekomendasi untuk mengendalikan pencemaran udara akibat emisi kendaraan di Kota Semarang, terutama pada kecamatan dengan nilai ISPU dan kepadatan kendaraan tertinggi.</p>
+                </div>
+                <div class="col-lg-7">
+                    <div class="owl-carousel testimonial-carousel">
+                        <div class="bg-white p-5">
+                            <i class="fa fa-3x fa-bus text-primary mb-4"></i>
+                            <h4>Optimalisasi Transportasi Umum</h4>
+                            <p class="m-0">Perluasan rute dan peningkatan layanan Trans Semarang untuk menekan penggunaan kendaraan pribadi di koridor padat seperti Pedurungan, Semarang Barat, dan Tembalang.</p>
+                        </div>
+                        <div class="bg-white p-5">
+                            <i class="fa fa-3x fa-tree text-primary mb-4"></i>
+                            <h4>Ruang Terbuka Hijau</h4>
+                            <p class="m-0">Penambahan RTH dan jalur hijau di sepanjang jalan arteri sebagai penyerap polutan, khususnya di kawasan pusat kota dan kawasan industri Genuk.</p>
+                        </div>
+                        <div class="bg-white p-5">
+                            <i class="fa fa-3x fa-tools text-primary mb-4"></i>
+                            <h4>Uji Emisi Berkala</h4>
+                            <p class="m-0">Penegakan uji emisi kendaraan bermotor secara rutin dan insentif bagi kendaraan rendah emisi maupun kendaraan listrik.</p>
+                        </div>
+                        <div class="bg-white p-5">
+                            <i class="fa fa-3x fa-broadcast-tower text-primary mb-4"></i>
+                            <h4>Perluasan Stasiun Pemantau</h4>
+                            <p class="m-0">Menambah titik pemantauan kualitas udara agar data ISPU tersedia merata di setiap kecamatan dan dapat diakses publik secara real-time.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Rekomendasi End -->
+
+
+    <!-- Kontak Start -->
+    <div id="kontak" class="container-fluid py-5">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-5 mb-5 mb-lg-0">
+                    <div class="bg-light d-flex flex-column justify-content-center px-5" style="height: 450px;">
+                        <div class="d-flex align-items-center mb-5">
+                            <div class="btn-icon bg-primary mr-4">
+                                <i class="fa fa-2x fa-university text-white"></i>
+                            </div>
+                            <div class="mt-n1">
+                                <h4>Instansi</h4>
+                                <p class="m-0">Universitas PGRI Semarang</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-5">
+                            <div class="btn-icon bg-secondary mr-4">
+                                <i class="fa fa-2x fa-book text-white"></i>
+                            </div>
+                            <div class="mt-n1">
+                                <h4>Mata Kuliah</h4>
+                                <p class="m-0">Sistem Informasi Geografis</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="btn-icon bg-warning mr-4">
+                                <i class="fa fa-2x fa-envelope text-white"></i>
+                            </div>
+                            <div class="mt-n1">
+                                <h4>Email</h4>
+                                <p class="m-0">email@kelompok.ac.id</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="section-title position-relative mb-4">
+                        <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Kontak</h6>
+                        <h1 class="display-4">Kirim Masukan</h1>
+                        <h4 class="mb-4">Punya data tambahan, saran, atau pertanyaan tentang penelitian ini? Silakan hubungi kami.</h4>
+                    </div>
+                    <div class="contact-form">
+                        <form>
+                            <div class="row">
+                                <div class="col-6 form-group">
+                                    <input type="text" class="form-control border-top-0 border-right-0 border-left-0 p-0" placeholder="Nama" required="required">
+                                </div>
+                                <div class="col-6 form-group">
+                                    <input type="email" class="form-control border-top-0 border-right-0 border-left-0 p-0" placeholder="Email" required="required">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control border-top-0 border-right-0 border-left-0 p-0" placeholder="Subjek" required="required">
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control border-top-0 border-right-0 border-left-0 p-0" rows="5" placeholder="Pesan" required="required"></textarea>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary py-3 px-5" type="submit">Kirim Pesan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Kontak End -->
+
+
+    <!-- Footer Start -->
+    <div class="container-fluid position-relative overlay-top bg-dark text-white-50 py-5" style="margin-top: 90px;">
+        <div class="container mt-5 pt-5">
+            <div class="row">
+                <div class="col-md-5 mb-5">
+                    <a href="index.html" class="navbar-brand">
+                        <h1 class="mt-n2 text-uppercase text-white"><i class="fa fa-wind mr-3"></i>UdaraSemarang</h1>
+                    </a>
+                    <p class="m-0">WebGIS studi kasus hubungan tingkat kualitas udara dengan jumlah kendaraan bermotor di Kota Semarang. Dibuat untuk tugas mata kuliah Sistem Informasi Geografis.</p>
+                </div>
+                <div class="col-md-4 mb-5">
+                    <h3 class="text-white mb-4">Navigasi</h3>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-white-50 mb-2" href="#latar-belakang"><i class="fa fa-angle-right mr-2"></i>Latar Belakang</a>
+                        <a class="text-white-50 mb-2" href="#peta-section"><i class="fa fa-angle-right mr-2"></i>Peta Interaktif</a>
+                        <a class="text-white-50 mb-2" href="#grafik"><i class="fa fa-angle-right mr-2"></i>Analisis Korelasi</a>
+                        <a class="text-white-50 mb-2" href="#data"><i class="fa fa-angle-right mr-2"></i>Tabel Data</a>
+                        <a class="text-white-50" href="#metodologi"><i class="fa fa-angle-right mr-2"></i>Metodologi</a>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-5">
+                    <h3 class="text-white mb-4">Sumber Data</h3>
+                    <div class="d-flex flex-column justify-content-start">
+                        <span class="mb-2"><i class="fa fa-angle-right mr-2"></i>DLH Kota Semarang</span>
+                        <span class="mb-2"><i class="fa fa-angle-right mr-2"></i>BPS Kota Semarang</span>
+                        <span class="mb-2"><i class="fa fa-angle-right mr-2"></i>Samsat / Bapenda Jateng</span>
+                        <span><i class="fa fa-angle-right mr-2"></i>OpenStreetMap</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid bg-dark text-white-50 border-top py-4" style="border-color: rgba(256, 256, 256, .1) !important;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-left mb-3 mb-md-0">
+                    <p class="m-0">Copyright &copy; <a class="text-white" href="#">UdaraSemarang</a> 2026. Tugas SIG.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-right">
+                    <!--/*** The author’s attribution link must remain intact in the template. ***/-->
+                    <!--/*** If you wish to remove this credit link, please purchase the Pro Version . ***/-->
+                    <p class="m-0">Designed by <a class="text-white" href="https://htmlcodex.com">HTML Codex</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary rounded-0 btn-lg-square back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/counterup/counterup.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Data & Aplikasi WebGIS -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+</body>
+
+</html>

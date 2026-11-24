@@ -1,0 +1,81 @@
+/* Penyesuaian tampilan: WebGIS Kualitas Udara Kota Semarang */
+.jumbotron {
+    background: linear-gradient(rgba(13, 61, 58, .78), rgba(15, 118, 110, .55) 60%, rgba(13, 61, 58, .70)), url(../img/header-semarang.svg) no-repeat center bottom;
+    background-size: cover;
+}
+.btn-secondary { background-color: #EA580C; border-color: #EA580C; }
+.btn-secondary:hover { background-color: #C2410C; border-color: #C2410C; }
+.navbar-light .navbar-nav .nav-link.active,
+.navbar-light .navbar-nav .nav-link:hover { color: #0F766E; }
+.hero-sub { font-size: 1.15rem; max-width: 760px; }
+.hero-badge {
+    display: inline-block; padding: 6px 16px; border: 1px solid rgba(255,255,255,.5);
+    border-radius: 30px; color: #fff; font-size: .9rem; letter-spacing: 1px;
+}
+
+/* Kartu umum */
+.card-gis { background: #fff; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.06); padding: 24px; height: 100%; }
+.card-gis h5 { margin-bottom: 1rem; }
+.chart-box { position: relative; height: 420px; }
+.chart-box.small { height: 320px; }
+
+/* ISPU */
+.ispu-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; }
+.ispu-row:last-child { border-bottom: 0; }
+.ispu-swatch { display: inline-block; width: 16px; height: 16px; border-radius: 50%; margin-right: 10px; vertical-align: middle; }
+.badge-ispu { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: .78rem; font-weight: 600; white-space: nowrap; }
+.detail-ispu { border-radius: 8px; padding: 14px; text-align: center; }
+.detail-ispu .display-4 { font-size: 3rem; line-height: 1; }
+
+/* Peta */
+#peta { height: 560px; border-radius: 8px; z-index: 1; }
+.legenda-peta {
+    position: absolute; bottom: 24px; left: 24px; z-index: 500; background: #fff; padding: 10px 14px;
+    border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,.2); font-size: .85rem; line-height: 1.8;
+}
+.btn-layer.active { background: #0F766E; color: #fff; border-color: #0F766E; }
+.popup-gis { font-size: .88rem; line-height: 1.7; min-width: 210px; }
+
+/* Polutan & metodologi */
+.polutan-item { background: #fff; border-radius: 8px; padding: 20px; height: 100%; border-top: 4px solid #0F766E; }
+.polutan-item h4 { color: #0F766E; }
+.step-card { position: relative; background: #fff; border-radius: 8px; padding: 32px 24px 24px; height: 100%; box-shadow: 0 4px 20px rgba(0,0,0,.06); transition: .3s; }
+.step-card:hover { transform: translateY(-6px); }
+.step-num {
+    position: absolute; top: -20px; left: 24px; width: 44px; height: 44px; border-radius: 50%;
+    background: #EA580C; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+
+/* Tabel */
+.table-gis thead th { background: #0F766E; color: #fff; border: 0; white-space: nowrap; }
+.table-gis td { vertical-align: middle; }
+
+/* Tim */
+.avatar {
+    width: 120px; height: 120px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0F766E, #14B8A6); color: #fff; font-size: 2.5rem; font-family: 'Jost', sans-serif; font-weight: 700;
+}
+.team-item .bg-light { border-radius: 8px; }
+
+/* Stat ringkas */
+.stat-box h1 { font-size: 2.2rem; }
+@media (max-width: 575.98px) {
+    .stat-box h1 { font-size: 1.5rem; }
+    .stat-box h6 { font-size: .7rem; }
+    #peta { height: 420px; }
+    .chart-box { height: 520px; }
+}
+
+[id] { scroll-margin-top: 90px; }
+
+/* Navbar: cegah teks menu terpotong 2 baris */
+.navbar-light .navbar-nav .nav-link, .navbar .btn { white-space: nowrap; }
+@media (min-width: 992px) {
+    .navbar-light .navbar-nav .nav-link { padding: 30px 12px; font-size: 16px; }
+    .navbar-brand h1 { font-size: 2rem; }
+}
+@media (min-width: 992px) and (max-width: 1299.98px) {
+    .navbar-light .navbar-nav .nav-link { padding: 30px 8px; font-size: 15px; }
+    .navbar-brand h1 { font-size: 1.6rem; }
+    .navbar .btn-primary.d-lg-block { display: none !important; }
+}
